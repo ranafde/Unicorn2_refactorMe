@@ -1,12 +1,14 @@
 package edu.upenn.cis573.hwk2;
 
 import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -16,8 +18,7 @@ import android.widget.TextView;
 
 public class GameView extends View {
     private Bitmap image;
-    private ArrayList<Integer> xPoints = new ArrayList<Integer>();
-    private ArrayList<Integer> yPoints = new ArrayList<Integer>();
+    private ArrayList<Point> xyPoints = new ArrayList<Point>();
     private boolean killed = false;
     private boolean newUnicorn = true;
     private int imagePointX = -150;
@@ -73,37 +74,35 @@ public class GameView extends View {
 		canvas.drawBitmap(image, imagePointX, imagePointY, null);
     	
 		// draws the stroke
-    	if (xPoints.size() > 1) {
-    		for (int i = 0; i < xPoints.size()-1; i++) {
-    			int startX = xPoints.get(i);
-    			int stopX = xPoints.get(i+1);
-    			int startY = yPoints.get(i);
-    			int stopY = yPoints.get(i+1);
+		if (xyPoints.size() > 1) {
+    		for (int i = 0; i < xyPoints.size()-1; i++) {
+    			int startX = xyPoints.get(i).x;
+    			int stopX = xyPoints.get(i).x;
+    			int startY = xyPoints.get(i).y;
+    			int stopY = xyPoints.get(i+1).y;
     			Paint paint = new Paint();
     			paint.setColor(lineColor);
     			paint.setStrokeWidth(lineWidth);
     			canvas.drawLine(startX, startY, stopX, stopY, paint);
     		}
     	}
-    	
     }
 
     /* 
      * This method is automatically called when the user touches the screen.
      */
     public boolean onTouchEvent(MotionEvent event) {
-    	
+    	Point pointxy = new Point();
     	if (event.getAction() == MotionEvent.ACTION_DOWN) {
-    		xPoints.add((int)event.getX());
-    		yPoints.add((int)event.getY());
+    		pointxy.set((int)event.getX(),(int)event.getY());
+    		xyPoints.add(pointxy);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-    		xPoints.add((int)event.getX());
-    		yPoints.add((int)event.getY());
+    		pointxy.set((int)event.getX(),(int)event.getY());
+    		xyPoints.add(pointxy);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_UP) {
-    		xPoints.clear();
-    		yPoints.clear();
+    		xyPoints.clear();
     	}
     	else {
     		return false;
