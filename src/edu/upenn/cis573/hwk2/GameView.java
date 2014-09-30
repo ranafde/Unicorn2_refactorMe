@@ -27,26 +27,40 @@ public class GameView extends View {
 
     public GameView(Context context) {
 	    super(context);
-	    setBackgroundResource(R.drawable.space);
+	    //setBackgroundResource(R.drawable.space);
+	    
 	    //image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
 	    //image = Bitmap.createScaledBitmap(image, 150, 150, false);
 	    //imagePointXY = new Point(-150,100);
-	    bitmapImage = new Image(-150,100);
-	    bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
-	    bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
-	    stroke = new Stroke();
+	    
+	    //bitmapImage = new Image(-150,100);
+	    
+	    //bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	    //bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+	    
+	    //setImageProperties(R.drawable.unicorn);
+	    //stroke = new Stroke();
+	    initializeParameters();
     }
     
     public GameView(Context context, AttributeSet attributeSet) {
     	super(context, attributeSet);
-	    setBackgroundResource(R.drawable.space);
-	   // image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	    
+    	//setBackgroundResource(R.drawable.space);
+	   
+    	// image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
 	   // image = Bitmap.createScaledBitmap(image, 150, 150, false);
 	    //imagePointXY = new Point(-150,100);
-	    bitmapImage = new Image(-150,100);
-	    bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
-	    bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
-	    stroke = new Stroke();
+	    
+    	//bitmapImage = new Image(-150,100);
+	    
+    	//bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	    //bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+	    
+	    //setImageProperties(R.drawable.unicorn);
+	    
+	    //stroke = new Stroke();
+    	initializeParameters();
     }
     
     /*
@@ -58,8 +72,10 @@ public class GameView extends View {
     	// resets the position of the unicorn if one is killed or reaches the right edge
     	if (newUnicorn || bitmapImage.getImagePointXY().x >= this.getWidth()) {
     		
-    		bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
-    		bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+    		//bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+    		//bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+    		setImageProperties(R.drawable.unicorn);
+    		
     		bitmapImage.getImagePointXY().x = -150;
     		bitmapImage.getImagePointXY().y = (int)(Math.random() * 200 + 200);
     		yChange = (int)(10 - Math.random() * 20);
@@ -72,8 +88,11 @@ public class GameView extends View {
     		//Bitmap explode = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
     	    //explode = Bitmap.createScaledBitmap(explode, 150, 150, false);
     		//canvas.drawBitmap(explode, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
-    		bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
-    		bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+    		
+    		//bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
+    		//bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+    		setImageProperties(R.drawable.explosion);
+    		
     		canvas.drawBitmap(bitmapImage.image, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
     		newUnicorn = true;
     		try { Thread.sleep(10); } catch (Exception e) { }
@@ -103,14 +122,16 @@ public class GameView extends View {
      * This method is automatically called when the user touches the screen.
      */
     public boolean onTouchEvent(MotionEvent event) {
-    	Point pointxy = new Point();
+    	//Point pointxy = new Point();
     	if (event.getAction() == MotionEvent.ACTION_DOWN) {
-    		pointxy.set((int)event.getX(),(int)event.getY());
-    		stroke.setPointXY(pointxy);
+    		//pointxy.set((int)event.getX(),(int)event.getY());
+    		//stroke.setPointXY(pointxy);
+    		recordPointXY(event);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-    		pointxy.set((int)event.getX(),(int)event.getY());
-    		stroke.setPointXY(pointxy);
+    		//pointxy.set((int)event.getX(),(int)event.getY());
+    		//stroke.setPointXY(pointxy);
+    		recordPointXY(event);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_UP) {
     		stroke.clearPoints();
@@ -139,6 +160,28 @@ public class GameView extends View {
     	return true;
     }    
 
+    public void recordPointXY(MotionEvent event){
+    	Point pointxy = new Point();
+    	pointxy.set((int)event.getX(),(int)event.getY());
+    	stroke.setPointXY(pointxy);
+    }
+    
+    private void setImageProperties(int resId){
+    	//Bitmap img;
+    	
+    	bitmapImage.setImage(BitmapFactory.decodeResource(getResources(), resId));
+    	bitmapImage.setImage(Bitmap.createScaledBitmap(bitmapImage.getImage(), 150, 150, false));
+    	
+    	//bitmapImage.image = BitmapFactory.decodeResource(getResources(), resId);
+		//bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);	
+    }
+    
+    private void initializeParameters(){
+    	setBackgroundResource(R.drawable.space);
+    	bitmapImage = new Image(-150,100);
+    	setImageProperties(R.drawable.unicorn);
+	    stroke = new Stroke();
+    }
     
     /*
      * This inner class is responsible for making the unicorn appear to move.

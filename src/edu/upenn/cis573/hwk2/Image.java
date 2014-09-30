@@ -21,13 +21,18 @@ public class Image {
 		imagePointXY = xy;
 	}
 	
-	public boolean pointInBounds(float xcoordinate, float ycoordinate, int height, int width){
-		
+	public boolean pointInBounds(float xcoordinate, float ycoordinate, int height, int width){	
 		if (xcoordinate > getImagePointXY().x && xcoordinate < getImagePointXY().x + width && ycoordinate > getImagePointXY().y && ycoordinate < getImagePointXY().y + height) {
 			return true;
 		}
-		
-		
 		return false;
+	}
+	
+	public void setImage(Bitmap image){
+		this.image = image;
+	}
+	
+	public Bitmap getImage(){
+		return image;
 	}
 }
