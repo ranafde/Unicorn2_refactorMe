@@ -1,12 +1,9 @@
 package edu.upenn.cis573.hwk2;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.AsyncTask;
@@ -17,11 +14,12 @@ import android.widget.TextView;
 
 
 public class GameView extends View {
-    private Bitmap image;
+    //private Bitmap image;
     private Stroke stroke;
     private boolean killed = false;
     private boolean newUnicorn = true;
-    private Point imagePointXY;
+    private Image bitmapImage;
+    //private Point imagePointXY;
     private int score = 0;
     private int yChange = 0;
     public long startTime;
@@ -30,18 +28,24 @@ public class GameView extends View {
     public GameView(Context context) {
 	    super(context);
 	    setBackgroundResource(R.drawable.space);
-	    image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
-	    image = Bitmap.createScaledBitmap(image, 150, 150, false);
-	    imagePointXY = new Point(-150,100);
+	    //image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	    //image = Bitmap.createScaledBitmap(image, 150, 150, false);
+	    //imagePointXY = new Point(-150,100);
+	    bitmapImage = new Image(-150,100);
+	    bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	    bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
 	    stroke = new Stroke();
     }
     
     public GameView(Context context, AttributeSet attributeSet) {
     	super(context, attributeSet);
 	    setBackgroundResource(R.drawable.space);
-	    image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
-	    image = Bitmap.createScaledBitmap(image, 150, 150, false);
-	    imagePointXY = new Point(-150,100);
+	   // image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	   // image = Bitmap.createScaledBitmap(image, 150, 150, false);
+	    //imagePointXY = new Point(-150,100);
+	    bitmapImage = new Image(-150,100);
+	    bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+	    bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
 	    stroke = new Stroke();
     }
     
@@ -52,9 +56,12 @@ public class GameView extends View {
     protected void onDraw(Canvas canvas) {    	
 
     	// resets the position of the unicorn if one is killed or reaches the right edge
-    	if (newUnicorn || imagePointXY.x >= this.getWidth()) {
-    		imagePointXY.x = -150;
-    		imagePointXY.y = (int)(Math.random() * 200 + 200);
+    	if (newUnicorn || bitmapImage.getImagePointXY().x >= this.getWidth()) {
+    		
+    		bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
+    		bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+    		bitmapImage.getImagePointXY().x = -150;
+    		bitmapImage.getImagePointXY().y = (int)(Math.random() * 200 + 200);
     		yChange = (int)(10 - Math.random() * 20);
     		newUnicorn = false;
     		killed = false;
@@ -62,9 +69,12 @@ public class GameView extends View {
 
 		// show the exploding image when the unicorn is killed
     	if (killed) {
-    		Bitmap explode = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
-    	    explode = Bitmap.createScaledBitmap(explode, 150, 150, false);
-    		canvas.drawBitmap(explode, imagePointXY.x, imagePointXY.y, null);
+    		//Bitmap explode = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
+    	    //explode = Bitmap.createScaledBitmap(explode, 150, 150, false);
+    		//canvas.drawBitmap(explode, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
+    		bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
+    		bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
+    		canvas.drawBitmap(bitmapImage.image, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
     		newUnicorn = true;
     		try { Thread.sleep(10); } catch (Exception e) { }
     		invalidate();
@@ -72,7 +82,7 @@ public class GameView extends View {
     	}
 
     	// draws the unicorn at the specified point
-		canvas.drawBitmap(image, imagePointXY.x, imagePointXY.y, null);
+		canvas.drawBitmap(bitmapImage.image, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
     	
 		// draws the stroke
 		if (stroke.numberOfPoints() > 1) {
@@ -110,13 +120,14 @@ public class GameView extends View {
     	}
     	
     	// see if the point is within the boundary of the image
-    	int width = image.getWidth();
-    	int height = image.getHeight();
+    	int width = bitmapImage.image.getWidth();
+    	int height = bitmapImage.image.getHeight();
     	float x = event.getX();
     	float y = event.getY();
     	// the !killed thing here is to prevent a "double-kill" that could occur
     	// while the "explosion" image is being shown
-    	if (!killed && x > imagePointXY.x && x < imagePointXY.x + width && y > imagePointXY.y && y < imagePointXY.y + height) {
+    	//if (!killed && x > bitmapImage.getImagePointXY().x && x < bitmapImage.getImagePointXY().x + width && y > bitmapImage.getImagePointXY().y && y < bitmapImage.getImagePointXY().y + height) {
+    	if (!killed && bitmapImage.pointInBounds(x,y, height, width)) {	
     		killed = true;
     		score++;
     		((TextView)(GameActivity.instance.getScoreboard())).setText(""+score);
@@ -142,8 +153,11 @@ public class GameView extends View {
     		try { 
     			// note: you can change these values to make the unicorn go faster/slower
     			Thread.sleep(10); 
-    			imagePointXY.x += 10; 
-    			imagePointXY.y += yChange; 
+    			Point xy = bitmapImage.getImagePointXY();
+    			xy.x += 10;
+    			xy.y += yChange;
+    			bitmapImage.setImagePointXY(xy); 
+    			 
     		} 
     		catch (Exception e) { }
     		// the return value is passed to "onPostExecute" but isn't actually used here
