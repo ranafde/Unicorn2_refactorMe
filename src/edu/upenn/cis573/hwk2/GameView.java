@@ -18,15 +18,12 @@ import android.widget.TextView;
 
 public class GameView extends View {
     private Bitmap image;
-    private ArrayList<Point> xyPoints = new ArrayList<Point>();
+    private Stroke stroke;
     private boolean killed = false;
     private boolean newUnicorn = true;
-    private int imagePointX = -150;
-    private int imagePointY = 100;
+    private Point imagePointXY;
     private int score = 0;
     private int yChange = 0;
-    private static final int lineColor = Color.RED;
-    private static final int lineWidth = 10;
     public long startTime;
     public long endTime;
 
@@ -35,6 +32,8 @@ public class GameView extends View {
 	    setBackgroundResource(R.drawable.space);
 	    image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
 	    image = Bitmap.createScaledBitmap(image, 150, 150, false);
+	    imagePointXY = new Point(-150,100);
+	    stroke = new Stroke();
     }
     
     public GameView(Context context, AttributeSet attributeSet) {
@@ -42,6 +41,8 @@ public class GameView extends View {
 	    setBackgroundResource(R.drawable.space);
 	    image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
 	    image = Bitmap.createScaledBitmap(image, 150, 150, false);
+	    imagePointXY = new Point(-150,100);
+	    stroke = new Stroke();
     }
     
     /*
@@ -51,9 +52,9 @@ public class GameView extends View {
     protected void onDraw(Canvas canvas) {    	
 
     	// resets the position of the unicorn if one is killed or reaches the right edge
-    	if (newUnicorn || imagePointX >= this.getWidth()) {
-    		imagePointX = -150;
-    		imagePointY = (int)(Math.random() * 200 + 200);
+    	if (newUnicorn || imagePointXY.x >= this.getWidth()) {
+    		imagePointXY.x = -150;
+    		imagePointXY.y = (int)(Math.random() * 200 + 200);
     		yChange = (int)(10 - Math.random() * 20);
     		newUnicorn = false;
     		killed = false;
@@ -63,7 +64,7 @@ public class GameView extends View {
     	if (killed) {
     		Bitmap explode = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
     	    explode = Bitmap.createScaledBitmap(explode, 150, 150, false);
-    		canvas.drawBitmap(explode, imagePointX, imagePointY, null);
+    		canvas.drawBitmap(explode, imagePointXY.x, imagePointXY.y, null);
     		newUnicorn = true;
     		try { Thread.sleep(10); } catch (Exception e) { }
     		invalidate();
@@ -71,18 +72,18 @@ public class GameView extends View {
     	}
 
     	// draws the unicorn at the specified point
-		canvas.drawBitmap(image, imagePointX, imagePointY, null);
+		canvas.drawBitmap(image, imagePointXY.x, imagePointXY.y, null);
     	
 		// draws the stroke
-		if (xyPoints.size() > 1) {
-    		for (int i = 0; i < xyPoints.size()-1; i++) {
-    			int startX = xyPoints.get(i).x;
-    			int stopX = xyPoints.get(i).x;
-    			int startY = xyPoints.get(i).y;
-    			int stopY = xyPoints.get(i+1).y;
+		if (stroke.numberOfPoints() > 1) {
+    		for (int i = 0; i < stroke.numberOfPoints()-1; i++) {
+    			int startX = stroke.getPointXY(i).x;
+    			int stopX = stroke.getPointXY(i).x;
+    			int startY = stroke.getPointXY(i).y;
+    			int stopY = stroke.getPointXY(i+1).y;
     			Paint paint = new Paint();
-    			paint.setColor(lineColor);
-    			paint.setStrokeWidth(lineWidth);
+    			paint.setColor(stroke.getLineColor());
+    			paint.setStrokeWidth(stroke.getLineWidth());
     			canvas.drawLine(startX, startY, stopX, stopY, paint);
     		}
     	}
@@ -95,14 +96,14 @@ public class GameView extends View {
     	Point pointxy = new Point();
     	if (event.getAction() == MotionEvent.ACTION_DOWN) {
     		pointxy.set((int)event.getX(),(int)event.getY());
-    		xyPoints.add(pointxy);
+    		stroke.setPointXY(pointxy);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_MOVE) {
     		pointxy.set((int)event.getX(),(int)event.getY());
-    		xyPoints.add(pointxy);
+    		stroke.setPointXY(pointxy);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_UP) {
-    		xyPoints.clear();
+    		stroke.clearPoints();
     	}
     	else {
     		return false;
@@ -115,7 +116,7 @@ public class GameView extends View {
     	float y = event.getY();
     	// the !killed thing here is to prevent a "double-kill" that could occur
     	// while the "explosion" image is being shown
-    	if (!killed && x > imagePointX && x < imagePointX + width && y > imagePointY && y < imagePointY + height) {
+    	if (!killed && x > imagePointXY.x && x < imagePointXY.x + width && y > imagePointXY.y && y < imagePointXY.y + height) {
     		killed = true;
     		score++;
     		((TextView)(GameActivity.instance.getScoreboard())).setText(""+score);
@@ -141,8 +142,8 @@ public class GameView extends View {
     		try { 
     			// note: you can change these values to make the unicorn go faster/slower
     			Thread.sleep(10); 
-    			imagePointX += 10; 
-    			imagePointY += yChange; 
+    			imagePointXY.x += 10; 
+    			imagePointXY.y += yChange; 
     		} 
     		catch (Exception e) { }
     		// the return value is passed to "onPostExecute" but isn't actually used here
