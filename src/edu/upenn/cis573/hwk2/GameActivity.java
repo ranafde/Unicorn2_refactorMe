@@ -1,16 +1,14 @@
 package edu.upenn.cis573.hwk2;
 
-import android.support.v7.app.ActionBarActivity;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-public class GameActivity extends ActionBarActivity {
+
+public class GameActivity extends OptionsHandler {
 	
 	// a global, static instance so that the GameView object can refer to this object
 	public static GameActivity instance;
@@ -32,22 +30,6 @@ public class GameActivity extends ActionBarActivity {
 		return instance.findViewById(R.id.scoreboard);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_about) {
-			Toast.makeText(getApplicationContext(), "Unicorn Game! \n(c)2014 Univ of Pennsylvania", Toast.LENGTH_SHORT).show(); 
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
     public void onButtonClick(View v) {
     	// this terminates the Activity and goes back to the previous one
     	finish();
