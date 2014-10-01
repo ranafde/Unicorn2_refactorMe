@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-
+import android.app.Activity;
 
 public class GameView extends View {
     //private Bitmap image;
@@ -19,6 +19,7 @@ public class GameView extends View {
     private boolean killed = false;
     private boolean newUnicorn = true;
     private Image bitmapImage;
+    public Activity parentActivity;
     //private Point imagePointXY;
     private int score = 0;
     private int yChange = 0;
@@ -70,14 +71,14 @@ public class GameView extends View {
     protected void onDraw(Canvas canvas) {    	
 
     	// resets the position of the unicorn if one is killed or reaches the right edge
-    	if (newUnicorn || bitmapImage.getImagePointXY().x >= this.getWidth()) {
+    	if (newUnicorn || getBitmapImage().getImagePointXY().x >= this.getWidth()) {
     		
     		//bitmapImage.image = BitmapFactory.decodeResource(getResources(), R.drawable.unicorn);
     		//bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
     		setImageProperties(R.drawable.unicorn);
     		
-    		bitmapImage.getImagePointXY().x = -150;
-    		bitmapImage.getImagePointXY().y = (int)(Math.random() * 200 + 200);
+    		getBitmapImage().getImagePointXY().x = -150;
+    		getBitmapImage().getImagePointXY().y = (int)(Math.random() * 200 + 200);
     		yChange = (int)(10 - Math.random() * 20);
     		newUnicorn = false;
     		killed = false;
@@ -93,7 +94,7 @@ public class GameView extends View {
     		//bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);
     		setImageProperties(R.drawable.explosion);
     		
-    		canvas.drawBitmap(bitmapImage.image, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
+    		canvas.drawBitmap(getBitmapImage().getImage(), getBitmapImage().getImagePointXY().x, getBitmapImage().getImagePointXY().y, null);
     		newUnicorn = true;
     		try { Thread.sleep(10); } catch (Exception e) { }
     		invalidate();
@@ -101,10 +102,11 @@ public class GameView extends View {
     	}
 
     	// draws the unicorn at the specified point
-		canvas.drawBitmap(bitmapImage.image, bitmapImage.getImagePointXY().x, bitmapImage.getImagePointXY().y, null);
+		canvas.drawBitmap(getBitmapImage().getImage(), getBitmapImage().getImagePointXY().x, getBitmapImage().getImagePointXY().y, null);
     	
 		// draws the stroke
-		if (stroke.numberOfPoints() > 1) {
+		stroke.drawStroke(canvas);
+		/*if (stroke.numberOfPoints() > 1) {
     		for (int i = 0; i < stroke.numberOfPoints()-1; i++) {
     			int startX = stroke.getPointXY(i).x;
     			int stopX = stroke.getPointXY(i).x;
@@ -115,7 +117,7 @@ public class GameView extends View {
     			paint.setStrokeWidth(stroke.getLineWidth());
     			canvas.drawLine(startX, startY, stopX, stopY, paint);
     		}
-    	}
+    	}*/
     }
 
     /* 
@@ -123,15 +125,15 @@ public class GameView extends View {
      */
     public boolean onTouchEvent(MotionEvent event) {
     	//Point pointxy = new Point();
-    	if (event.getAction() == MotionEvent.ACTION_DOWN) {
+    	if ((event.getAction() == MotionEvent.ACTION_DOWN) || (event.getAction() == MotionEvent.ACTION_MOVE)){
     		//pointxy.set((int)event.getX(),(int)event.getY());
     		//stroke.setPointXY(pointxy);
     		recordPointXY(event);
-    	}
-    	else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+    	//}
+    	//else if (event.getAction() == MotionEvent.ACTION_MOVE) {
     		//pointxy.set((int)event.getX(),(int)event.getY());
     		//stroke.setPointXY(pointxy);
-    		recordPointXY(event);
+    		//recordPointXY(event);
     	}
     	else if (event.getAction() == MotionEvent.ACTION_UP) {
     		stroke.clearPoints();
@@ -141,17 +143,18 @@ public class GameView extends View {
     	}
     	
     	// see if the point is within the boundary of the image
-    	int width = bitmapImage.image.getWidth();
-    	int height = bitmapImage.image.getHeight();
+    	int width = getBitmapImage().getImage().getWidth();
+    	int height = getBitmapImage().getImage().getHeight();
     	float x = event.getX();
     	float y = event.getY();
     	// the !killed thing here is to prevent a "double-kill" that could occur
     	// while the "explosion" image is being shown
     	//if (!killed && x > bitmapImage.getImagePointXY().x && x < bitmapImage.getImagePointXY().x + width && y > bitmapImage.getImagePointXY().y && y < bitmapImage.getImagePointXY().y + height) {
-    	if (!killed && bitmapImage.pointInBounds(x,y, height, width)) {	
+    	if (!killed && getBitmapImage().pointInBounds(x,y, height, width)) {	
     		killed = true;
     		score++;
-    		((TextView)(GameActivity.instance.getScoreboard())).setText(""+score);
+    		//((TextView)(GameActivity.instance.getScoreboard())).setText(""+score);
+    		((TextView)(((GameActivity) parentActivity).getScoreboard())).setText(""+score);
     	}
     	
     	// forces a redraw of the View
@@ -169,8 +172,8 @@ public class GameView extends View {
     private void setImageProperties(int resId){
     	//Bitmap img;
     	
-    	bitmapImage.setImage(BitmapFactory.decodeResource(getResources(), resId));
-    	bitmapImage.setImage(Bitmap.createScaledBitmap(bitmapImage.getImage(), 150, 150, false));
+    	getBitmapImage().setImage(BitmapFactory.decodeResource(getResources(), resId));
+    	getBitmapImage().setImage(Bitmap.createScaledBitmap(getBitmapImage().getImage(), 150, 150, false));
     	
     	//bitmapImage.image = BitmapFactory.decodeResource(getResources(), resId);
 		//bitmapImage.image = Bitmap.createScaledBitmap(bitmapImage.image, 150, 150, false);	
@@ -178,17 +181,40 @@ public class GameView extends View {
     
     private void initializeParameters(){
     	setBackgroundResource(R.drawable.space);
-    	bitmapImage = new Image(-150,100);
+    	setBitmapImage(new Image(-150,100));
     	setImageProperties(R.drawable.unicorn);
 	    stroke = new Stroke();
+	    parentActivity = (GameActivity) getContext();
     }
+
+	public Image getBitmapImage() {
+		return bitmapImage;
+	}
+
+	public void setBitmapImage(Image bitmapImage) {
+		this.bitmapImage = bitmapImage;
+	}
     
+	public int getYChange() {
+		return yChange;
+	}
+
+	public void setYChange(int yChange) {
+		this.yChange = yChange;
+	}
+	
+	public int getScore(){
+		return score;
+	}
+	
+	
     /*
      * This inner class is responsible for making the unicorn appear to move.
      * When "exec" is called on an object of this class, "doInBackground" gets
      * called in a background thread. It just waits 10ms and then updates the
      * image's position. Then "onPostExecute" is called.
      */
+    /*
     class BackgroundDrawingTask extends AsyncTask<Integer, Void, Integer> {
     	
     	// this method gets run in the background
@@ -225,6 +251,6 @@ public class GameView extends View {
     		}
     	}    	
     }
-
+	*/
 }
 

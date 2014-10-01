@@ -13,10 +13,12 @@ public class BackgroundDrawingTask extends AsyncTask<GameView, Void, GameView> {
 			Thread.sleep(10); 
 			Point xy = gameview[0].getBitmapImage().getImagePointXY();
 			Image img;
-					//gameview[0].getBitmapImage().getImagePointXY());
+			//gameview[0].getBitmapImage().getImagePointXY());
+			
 			xy.x += 10;
 			xy.y += gameview[0].getYChange();
 			//bitmapImage.setImagePointXY(xy); 
+			
 			img = gameview[0].getBitmapImage();
 			img.setImagePointXY(xy);
 			gameview[0].setBitmapImage(img); 
@@ -39,8 +41,12 @@ public class BackgroundDrawingTask extends AsyncTask<GameView, Void, GameView> {
 			// game over, man!
 			result.endTime = System.currentTimeMillis();
 			// these methods are deprecated but it's okay to use them... probably.
-			GameActivity.instance.removeDialog(1);
-			GameActivity.instance.showDialog(1);
+			
+			//GameActivity.instance.removeDialog(1);
+			//GameActivity.instance.showDialog(1);
+			
+			result.parentActivity.removeDialog(1);
+			result.parentActivity.showDialog(1);
 		}
 	}    	
 

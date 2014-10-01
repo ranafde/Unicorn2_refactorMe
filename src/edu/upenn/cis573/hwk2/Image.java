@@ -6,19 +6,19 @@ import android.graphics.Point;
 import android.widget.TextView;
 
 public class Image {
-	public Bitmap image;
+	private Bitmap image;
 	private Point imagePointXY;
 	
 	Image(int x, int y){
-		imagePointXY = new Point(x, y);    
+		this.imagePointXY = new Point(x, y);    
 	}
 
 	public Point getImagePointXY(){
-		return imagePointXY;
+		return this.imagePointXY;
 	}
 	
 	public void setImagePointXY(Point xy){
-		imagePointXY = xy;
+		this.imagePointXY = xy;
 	}
 	
 	public boolean pointInBounds(float xcoordinate, float ycoordinate, int height, int width){	

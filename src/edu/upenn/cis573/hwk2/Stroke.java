@@ -2,7 +2,9 @@ package edu.upenn.cis573.hwk2;
 
 import java.util.ArrayList;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 
 public class Stroke {
@@ -37,6 +39,21 @@ public class Stroke {
     
     public int getLineColor(){
     	return lineColor;
+    }
+    
+    public void drawStroke(Canvas canvas){
+    	if (numberOfPoints() > 1) {
+    		for (int i = 0; i < numberOfPoints()-1; i++) {
+    			int startX = getPointXY(i).x;
+    			int stopX = getPointXY(i).x;
+    			int startY = getPointXY(i).y;
+    			int stopY = getPointXY(i+1).y;
+    			Paint paint = new Paint();
+    			paint.setColor(getLineColor());
+    			paint.setStrokeWidth(getLineWidth());
+    			canvas.drawLine(startX, startY, stopX, stopY, paint);
+    		}
+    	}
     }
    
 }
